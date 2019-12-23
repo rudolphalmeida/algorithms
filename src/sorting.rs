@@ -77,6 +77,34 @@ fn merge<T: Ord + Clone + Copy>(left: &mut [T], right: &mut [T]) {
     }
 }
 
+pub fn quick_sort<T: Ord>(arr: &mut [T]) {
+    let len = arr.len();
+    if len >= 2 {
+        let pivot = partition(arr);
+        quick_sort(&mut arr[..pivot]);
+        quick_sort(&mut arr[pivot + 1..]);
+    }
+}
+
+fn partition<T: Ord>(arr: &mut [T]) -> usize {
+    let len = arr.len();
+    let pivot_index = len / 2;
+    let last_index = len - 1;
+
+    arr.swap(pivot_index, last_index);
+
+    let mut store_index = 0;
+    for i in 0..last_index {
+        if arr[i] < arr[last_index] {
+            arr.swap(i, store_index);
+            store_index += 1;
+        }
+    }
+
+    arr.swap(store_index, last_index);
+    store_index
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -210,5 +238,20 @@ mod tests {
         let mut v = sample_data();
         merge_sort(&mut v);
         assert_eq!(v, sorted_sample_data());
+    }
+
+    #[test]
+    fn test_quick_sort() {
+        let mut v = vec![5, 4, 3, 2, 1];
+        quick_sort(&mut v);
+        assert_eq!(v, vec![1, 2, 3, 4, 5]);
+
+        let mut v = vec![1, 2, 3, 4, 5, 5, 4, 3, 2, 1];
+        quick_sort(&mut v);
+        assert_eq!(v, vec![1, 1, 2, 2, 3, 3, 4, 4, 5, 5]);
+
+        let mut v = vec![1, 2, 3, 4, 5];
+        quick_sort(&mut v);
+        assert_eq!(v, vec![1, 2, 3, 4, 5]);
     }
 }
